@@ -219,8 +219,9 @@ protected:
   virtual void HandleOKCallback() {
     NanScope();
     Local<Object> childObject = InstanceClass::NewInstance(lookupHandle_);
-    InstanceClass *child = ObjectWrap::Unwrap<InstanceClass>(childObject);
-    parent_->children_.push_back(child);
+    Persistent<Object> persistentHandle;
+    NanAssignPersistent(persistentHandle, childObject);
+    parent_->children_.push_back(persistentHandle);
     v8::Local<v8::Value> argv[] = { NanNull(), childObject };
     callback->Call(2, argv);
   }
@@ -228,7 +229,6 @@ protected:
   ParentClass *parent_;
   std::string value_;
   InstanceHandleType lookupHandle_;
-
 };
 
 #endif  // NLV_ASYNC_WORKER_H

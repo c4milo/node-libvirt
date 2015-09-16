@@ -31,16 +31,18 @@ public:
   }
 
   virtual void ClearChildren() {
-    std::vector<NLVObjectBase*>::const_iterator it;
+    std::vector< Persistent<Object> >::const_iterator it;
     for (it = children_.begin(); it != children_.end(); ++it) {
-      (*it)->ClearChildren();
-      (*it)->ClearHandle();
+      Persistent<Object> persistentRef = *it;
+      NLVObjectBase *obj = ObjectWrap::Unwrap<NLVObject>(persistentRef);
+      obj->ClearChildren();
+      obj->ClearHandle();
     }
 
     children_.clear();
   }
 
-  std::vector<NLVObjectBase*> children_;
+  std::vector< Persistent<Object> > children_;
 
 protected:
   HandleType handle_;
