@@ -33,8 +33,7 @@ public:
   virtual void ClearChildren() {
     std::vector< Persistent<Object> >::const_iterator it;
     for (it = children_.begin(); it != children_.end(); ++it) {
-      Persistent<Object> persistentRef = *it;
-      NLVObjectBase *obj = ObjectWrap::Unwrap<NLVObject>(persistentRef);
+      NLVObjectBase *obj = ObjectWrap::Unwrap<NLVObject>(*it);
       obj->ClearChildren();
       obj->ClearHandle();
     }
