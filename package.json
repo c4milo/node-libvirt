@@ -55,16 +55,16 @@
   ],
   "dependencies": {
     "bindings": "^1.2.1",
-    "bluebird": "^3.1.1",
-    "nan": "^2.1.0"
+    "bluebird": "^3.4.1",
+    "nan": "^2.3.5"
   },
   "devDependencies": {
-    "chai": "^3.4.1",
-    "jshint": "^2.9.1-rc1",
-    "mocha": "^2.3.4",
+    "chai": "^3.5.0",
+    "jshint": "^2.9.2",
+    "mocha": "^2.5.3",
     "segfault-handler": "^1.0.0",
-    "semver": "^5.1.0",
-    "xpath": "^0.0.9",
-    "xmldom": "^0.1.19"
+    "semver": "^5.1.1",
+    "xpath": "^0.0.23",
+    "xmldom": "^0.1.22"
   }
 }

@@ -859,30 +859,32 @@ NAN_METHOD(Domain::SetMetadata)
   unsigned int flags;
   Nan::Callback *callback;
   if (info.Length() == 6
-	  && info[0]->IsNumber()
-	  && (info[1]->IsString() || info[1]->IsNull())
-	  && (info[2]->IsString() || info[2]->IsNull())
-	  && (info[3]->IsString() || info[3]->IsNull())
-	  && info[4]->IsNumber()
-	  && info[5]->IsFunction())
+    && info[0]->IsNumber()
+    && (info[1]->IsString() || info[1]->IsNull())
+    && (info[2]->IsString() || info[2]->IsNull())
+    && (info[3]->IsString() || info[3]->IsNull())
+    && info[4]->IsNumber()
+    && info[5]->IsFunction())
   {
     type = info[0]->IntegerValue();
     if (info[1]->IsNull()) {
-	null_metadata = true;
+      null_metadata = true;
     } else {
-	null_metadata = false;
-	metadata = *Nan::Utf8String(info[1]->ToString());
+      null_metadata = false;
+      metadata = *Nan::Utf8String(info[1]->ToString());
     }
+
     if (!info[2]->IsNull())
-	namespace_key = *Nan::Utf8String(info[2]->ToString());
+      namespace_key = *Nan::Utf8String(info[2]->ToString());
     if (!info[3]->IsNull())
-	namespace_uri = *Nan::Utf8String(info[3]->ToString());
+      namespace_uri = *Nan::Utf8String(info[3]->ToString());
     flags = info[4]->IntegerValue();
     callback = new Nan::Callback(info[5].As<Function>());
   } else {
     Nan::ThrowTypeError("signature is type, metadata, namespace_key, namespace_uri, flags, callback");
     return;
   }
+
   Domain *domain = Nan::ObjectWrap::Unwrap<Domain>(info.This());
   Nan::AsyncQueueWorker(new SetMetadataWorker(callback, domain->handle_, type, null_metadata, metadata, namespace_key, namespace_uri, flags));
   return;
@@ -2118,7 +2120,7 @@ NAN_METHOD(Domain::SetSchedulerParameters)
 
   type = virDomainGetSchedulerType(domain->handle_, &nparams);
   if (type == NULL) {
-    Nan::ThrowError(Error::New(virSaveLastError()));
+    Nan::ThrowError(NLV_ERROR(virSaveLastError()));
     return info.GetReturnValue().Set(Nan::False());
   }
   free(type);
@@ -2133,7 +2135,7 @@ NAN_METHOD(Domain::SetSchedulerParameters)
 
   ret = virDomainGetSchedulerParameters(domain->handle_, params, &nparams);
   if(ret == -1) {
-    Nan::ThrowError(Error::New(virSaveLastError()));
+    Nan::ThrowError(NLV_ERROR(virSaveLastError()));
     free(params);
     return info.GetReturnValue().Set(Nan::False());
   }
@@ -2170,7 +2172,7 @@ NAN_METHOD(Domain::SetSchedulerParameters)
 
   ret = virDomainSetSchedulerParameters(domain->handle_, params, nparams);
   if (ret == -1) {
-    Nan::ThrowError(Error::New(virSaveLastError()));
+    Nan::ThrowError(NLV_ERROR(virSaveLastError()));
     free(params);
     return info.GetReturnValue().Set(Nan::False());
   }
