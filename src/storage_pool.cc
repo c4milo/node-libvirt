@@ -7,6 +7,7 @@
 
 #include "storage_volume.h"
 #include "storage_pool.h"
+#include "worker.h"
 //FIXME default params, default flags
 
 namespace NLV {
@@ -57,16 +58,6 @@ void StoragePool::Initialize(Handle<Object> exports)
 }
 
 StoragePool::StoragePool(virStoragePoolPtr handle) : NLVObject(handle) {}
-Local<Object> StoragePool::NewInstance(virStoragePoolPtr handle)
-{
-  Nan::EscapableHandleScope scope;
-  Local<Function> ctor = Nan::New<Function>(constructor);
-  Local<Object> object = ctor->NewInstance();
-
-  StoragePool *storagePool = new StoragePool(handle);
-  storagePool->Wrap(object);
-  return scope.Escape(object);
-}
 
 NLV_LOOKUP_BY_VALUE_EXECUTE_IMPL(StoragePool, LookupByName, virStoragePoolLookupByName)
 NAN_METHOD(StoragePool::LookupByName)
@@ -116,7 +107,15 @@ NAN_METHOD(StoragePool::LookupByUUID)
 NAN_METHOD(StoragePool::LookupByVolume)
 {
   Nan::HandleScope scope;
-  return;
+  auto volume = StorageVolume::UnwrapHandle(info[0]);
+  
+  Worker::RunAsync(info, [=](Worker::SetOnFinishedHandler onFinished) {
+    auto storagePool = virStoragePoolLookupByVolume(volume);
+    if(!storagePool) {
+      return virSaveLastError();
+    }
+    return onFinished(InstanceReturnHandler<StoragePool>(storagePool));
+  });
 }
 
 NAN_METHOD(StoragePool::Create)
@@ -128,16 +127,16 @@ NAN_METHOD(StoragePool::Create)
     return;
   }
 
-  if (!Nan::New(Hypervisor::constructor_template)->HasInstance(info.This())) {
-    Nan::ThrowTypeError("You must specify a Hypervisor instance");
-    return;
-  }
-
-  Hypervisor *hv = ObjectWrap::Unwrap<Hypervisor>(info.This());
+  auto hv = Hypervisor::UnwrapHandle(info.This());
   std::string xmlData(*Nan::Utf8String(info[0]->ToString()));
-  Nan::Callback *callback = new Nan::Callback(info[1].As<Function>());
-  NLV::AsyncQueueWorker(new CreateWorker(callback, hv, xmlData), info.This());
-  return;
+
+  Worker::RunAsync(info, [=](Worker::SetOnFinishedHandler onFinished) {
+    auto lookupHandle = virStoragePoolCreateXML(hv, xmlData.c_str(), 0);
+    if (lookupHandle == NULL) {
+      return virSaveLastError();
+    }
+    return onFinished(InstanceReturnHandler<StoragePool>(lookupHandle));
+  });
 }
 
 NLV_WORKER_EXECUTE(StoragePool, Create)

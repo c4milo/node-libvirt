@@ -16,12 +16,13 @@ struct HypervisorCleanupHandler {
   }
 };
 
-class Hypervisor : public NLVObject<virConnectPtr, HypervisorCleanupHandler>
+class Hypervisor : public NLVObject<Hypervisor, virConnectPtr, HypervisorCleanupHandler>
 {
 public:
   static void Initialize(Handle<Object> exports);
-
+  NLV_OBJECT_STATIC_HELPERS(Hypervisor);
 private:
+  explicit Hypervisor(virConnectPtr handle) : NLVObject(handle) {};
   explicit Hypervisor(std::string uri, std::string user, std::string pass, bool readOnly);
   static Nan::Persistent<Function> constructor;
   static Nan::Persistent<FunctionTemplate> constructor_template;
@@ -95,18 +96,6 @@ private:
   // static NAN_METHOD(FindStoragePoolSources);
 
 private:
-  // ACTION WORKERS
-  class ConnectWorker : public NLVAsyncWorker<virConnectPtr> {
-  public:
-    ConnectWorker(Nan::Callback *callback, Hypervisor *hypervisor)
-      : NLVAsyncWorker(callback, NULL), hypervisor_(hypervisor) {}
-
-    void Execute();
-    static int auth_callback(virConnectCredentialPtr cred, unsigned int ncred, void *data);
-  private:
-    Hypervisor *hypervisor_;
-  };
-
   class DisconnectWorker : public NLVAsyncWorker<virConnectPtr> {
   public:
     DisconnectWorker(Nan::Callback *callback, Hypervisor *hypervisor)
