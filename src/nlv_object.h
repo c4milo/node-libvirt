@@ -54,6 +54,8 @@ public:
   virtual void ClearHandle() = 0;
   virtual void ClearChildren() = 0;
   virtual void SetParentReference(NLVObjectBasePtr *parentReference) = 0;
+  
+  std::vector<NLVObjectBasePtr*> children_;
 };
 
 template <typename ParentClass, typename HandleType, typename CleanupHandler>
@@ -145,8 +147,6 @@ public:
   virtual void SetParentReference(NLVObjectBasePtr *parentReference) {
     parentReference_ = parentReference;
   }
-
-  std::vector<NLVObjectBasePtr*> children_;
 
 protected:
   HandleType handle_;

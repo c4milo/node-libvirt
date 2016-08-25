@@ -114,7 +114,7 @@ NAN_METHOD(StoragePool::LookupByVolume)
     if(!storagePool) {
       return virSaveLastError();
     }
-    return onFinished(InstanceReturnHandler<Hypervisor, StoragePool>(storagePool));
+    return onFinished(InstanceReturnHandler<StoragePool>(storagePool));
   });
 }
 
@@ -135,7 +135,7 @@ NAN_METHOD(StoragePool::Create)
     if (lookupHandle == NULL) {
       return virSaveLastError();
     }
-    return onFinished(InstanceReturnHandler<Hypervisor, StoragePool>(lookupHandle));
+    return onFinished(InstanceReturnHandler<StoragePool>(lookupHandle));
   });
 }
 

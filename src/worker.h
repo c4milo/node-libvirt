@@ -47,23 +47,25 @@ namespace NLV {
       worker->Call(2, argv);
     };
   }
-  template<class ParentClass, class T, class Y>
+  template<class T, class Y>
   Worker::OnFinishedHandler InstanceReturnHandler(Y val) {
     return [=](Worker* worker) {
       Nan::HandleScope scope;
+      Nan::TryCatch try_catch;
+      
       Local<Object> childObject = T::NewInstance(val);
       Local<Value> parentObject = worker->GetFromPersistent("parent");
+      T *child = T::Unwrap(childObject);
+      NLVObjectBasePtr *childPtr = new NLVObjectBasePtr(child);
       if (parentObject->IsObject()) {
         childObject->Set(Nan::New("_parent").ToLocalChecked(), parentObject);
+        
+        auto parent = Nan::ObjectWrap::Unwrap<NLVObjectBase>(parentObject->ToObject());
+        if(parent) {
+          parent->children_.push_back(childPtr);
+        }
       }
-      T *child = Nan::ObjectWrap::Unwrap<T>(childObject);
-      NLVObjectBasePtr *childPtr = new NLVObjectBasePtr(child);
       child->SetParentReference(childPtr);
-      auto parent = ParentClass::Unwrap(parentObject);
-      if(parent) {
-        parent->children_.push_back(childPtr);
-      }
-      Nan::TryCatch try_catch;
       if(try_catch.HasCaught()) {
         v8::Local<v8::Value> argv[] = { try_catch.Exception() };
         worker->Call(1, argv);
