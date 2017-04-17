@@ -40,6 +40,7 @@ int EventImpl::nextWatch = 1;
 int EventImpl::nextTimeout = 1;
 std::vector<nodeEventHandle*> EventImpl::handles;
 std::vector<nodeEventTimeout*> EventImpl::timeouts;
+bool EventImpl::started = false;
 
 void EventImpl::Initialize(Handle<Object> exports)
 {
@@ -51,7 +52,13 @@ void EventImpl::Initialize(Handle<Object> exports)
 NAN_METHOD(EventImpl::SetupEvent)
 {
   Nan::HandleScope scope;
+  StartEventLoop();
+}
 
+bool EventImpl::IsEventLoopStarted() { return started; }
+void EventImpl::StartEventLoop()
+{
+  if (started) return;
   uv_mutex_init(&lock);
   uv_check_init(uv_default_loop(), &updateHandleChecker);
   uv_check_start(&updateHandleChecker, EventImpl::UpdateHandlesOnce);
@@ -61,7 +68,7 @@ NAN_METHOD(EventImpl::SetupEvent)
     AddTimeout, UpdateTimeout, RemoveTimeout
   );
 
-  return;
+  started = true;
 }
 
 #if UV_VERSION_MAJOR < 1
