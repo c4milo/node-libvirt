@@ -523,21 +523,25 @@ custom set of parameters for the event.
 
 #### Parameters:
 An object with the following structure:
+
+```js
     { 'evtype':     hypervisor.VIR_DOMAIN_EVENT_ID_LIFECYCLE,
       'domain':     mydomain,
       'callback':   function(hyp, dom, data) {
 
-                     }
+                    }
     }
-evtype is an OR'ed set of the following constants:
-    hypervisor.VIR_DOMAIN_EVENT_ID_LIFECYCLE
-    hypervisor.VIR_DOMAIN_EVENT_ID_REBOOT
-    hypervisor.VIR_DOMAIN_EVENT_ID_RTC_CHANGE
-    hypervisor.VIR_DOMAIN_EVENT_ID_WATCHDOG
-    hypervisor.VIR_DOMAIN_EVENT_ID_IO_ERROR
-    hypervisor.VIR_DOMAIN_EVENT_ID_GRAPHICS
-    hypervisor.VIR_DOMAIN_EVENT_ID_IO_ERROR_REASON
-    hypervisor.VIR_DOMAIN_EVENT_ID_LAST
+```
+
+`evtype` is an OR'ed set of the following constants:
+- `hypervisor.VIR_DOMAIN_EVENT_ID_LIFECYCLE`
+- `hypervisor.VIR_DOMAIN_EVENT_ID_REBOOT`
+- `hypervisor.VIR_DOMAIN_EVENT_ID_RTC_CHANGE`
+- `hypervisor.VIR_DOMAIN_EVENT_ID_WATCHDOG`
+- `hypervisor.VIR_DOMAIN_EVENT_ID_IO_ERROR`
+- `hypervisor.VIR_DOMAIN_EVENT_ID_GRAPHICS`
+- `hypervisor.VIR_DOMAIN_EVENT_ID_IO_ERROR_REASON`
+- `hypervisor.VIR_DOMAIN_EVENT_ID_LAST`
 
 #### Return:
 
